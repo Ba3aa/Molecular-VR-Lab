@@ -63,7 +63,14 @@ export default function VrModelCisplatin() {
   // مرساة المتجهات — يتم تحديثها ديناميكياً إذا تغير الموضع
   const anchorVec = useMemo(() => new THREE.Vector3(...ANCHOR_POSITION), []);
 
-  const { scene }     = useGLTF('/chemical-models/cisplatin-model.glb');
+  const isDnaMode       = useAppStore((state) => state.isDnaMode);
+
+  // تحديث المسارات لتعمل بشكل صحيح على GitHub Pages (Subpath Compatibility)
+  const modelPath = isDnaMode 
+    ? import.meta.env.BASE_URL + 'chemical-models/cisplatin-dna-mix.glb'
+    : import.meta.env.BASE_URL + 'chemical-models/cisplatin-model.glb';
+
+  const { scene }     = useGLTF(modelPath);
   const controllers   = useXR((state) => state.controllers);
   const { camera }    = useThree();
 
@@ -207,5 +214,6 @@ export default function VrModelCisplatin() {
   );
 }
 
-// تحميل مسبق لتقليل وقت الانتظار عند الدخول إلى VR
-useGLTF.preload('/chemical-models/cisplatin-model.glb');
+// تحميل مسبق لكلا النموذجين لضمان انتقال سلس بين الأوضاع
+useGLTF.preload(import.meta.env.BASE_URL + 'chemical-models/cisplatin-model.glb');
+useGLTF.preload(import.meta.env.BASE_URL + 'chemical-models/cisplatin-dna-mix.glb');

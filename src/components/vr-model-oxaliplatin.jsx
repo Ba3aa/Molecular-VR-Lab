@@ -68,7 +68,14 @@ export default function VrModelOxaliplatin() {
   // مرساة المتجهات — يتم تحديثها ديناميكياً إذا تغير الموضع
   const anchorVec = useMemo(() => new THREE.Vector3(...ANCHOR_POSITION), []);
 
-  const { scene }      = useGLTF('/chemical-models/oxaliplatin-model.glb');
+  const isDnaMode       = useAppStore((state) => state.isDnaMode);
+
+  // تحديث المسارات لتعمل بشكل صحيح على GitHub Pages (Subpath Compatibility)
+  const modelPath = isDnaMode 
+    ? import.meta.env.BASE_URL + 'chemical-models/oxaliplatin-dna-mix.glb'
+    : import.meta.env.BASE_URL + 'chemical-models/oxaliplatin-model.glb';
+
+  const { scene }      = useGLTF(modelPath);
   const controllers    = useXR((state) => state.controllers);
   const { camera }     = useThree();
 
@@ -187,4 +194,6 @@ export default function VrModelOxaliplatin() {
   );
 }
 
-useGLTF.preload('/chemical-models/oxaliplatin-model.glb');
+// تحميل مسبق لكلا النموذجين لضمان انتقال سلس بين الأوضاع
+useGLTF.preload(import.meta.env.BASE_URL + 'chemical-models/oxaliplatin-model.glb');
+useGLTF.preload(import.meta.env.BASE_URL + 'chemical-models/oxaliplatin-dna-mix.glb');
