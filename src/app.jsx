@@ -11,7 +11,7 @@ import VrModelOxaliplatin from './components/vr-model-oxaliplatin';
 import VrSpatialMenu from './components/vr-spatial-menu';
 import VrInfoOxaliplatin from './components/vr-info-oxaliplatin';
 
-// xrStore يُنشأ مرة واحدة خارج المكوّن لمنع إعادة التصيير
+// الـ xrStore بنسويه مرة وحدة برا المكون مشان ما نضل نعيد الشغل عالفاضي
 const xrStore = createXRStore();
 
 export default function App() {
@@ -20,10 +20,7 @@ export default function App() {
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative', background: '#000' }}>
 
-      {/* ══════════════════════════════════════════════════════
-          زر دخول VR — يظهر فقط خارج جلسة الواقع الافتراضي
-          enterVR() تستدعي WebXR API لطلب immersive-vr session
-          ══════════════════════════════════════════════════════ */}
+      {/* زر دخول VR - بيطلع بس لما نكون برا الـ VR */}
       {!isVrActive && (
         <div style={{
           position:        'absolute',
@@ -68,16 +65,12 @@ export default function App() {
         </div>
       )}
 
-      {/* ══════════════════════════════════════════════════════
-          الـ Canvas الرئيسي — كل المحتوى ثلاثي الأبعاد داخله
-          ══════════════════════════════════════════════════════ */}
+      {/* الكانفاس الأساسي - كل الشغل الثلاثي الأبعاد بكون هون */}
       <XrCanvas xrStore={xrStore}>
         {/*
-          Suspense boundary واحدة تغلِّف كل مكوّنات VR:
-          - VrSpatialMenu و VrInfoOxaliplatin يستخدمان <Text> من drei
-            الذي يُحمِّل خطوطاً بشكل async — يجب أن يكونا داخل Suspense
-          - VrStars و VrLighting و VrTeleport خفيفة لكن لا ضرر من وضعها
-            داخل نفس الـ boundary لضمان ترتيب ظهور موحَّد
+          سوسبنس (Suspense) وحدة بتلم كل مكونات الـ VR:
+          - المنيو ومعلومات الدوا بستخدموا نصوص بتتحمل بالخفاء، فبدها سوسبنس
+          - النجوم والاضاءة والـ Teleport حطيناهم هون مشان يطلعوا كلهم مع بعض بترتيب مرتب
         */}
         <Suspense fallback={<VrLoadingScreen />}>
           <VrStars />

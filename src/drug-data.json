@@ -1,18 +1,36 @@
 {
   "cisplatin": {
-    "title": "Cisplatin (Pt-based)",
-    "description": "Cisplatin is a prominent chemotherapy drug used to treat various types of cancers. It features a platinum atom bonded to two chloride ions and two ammonia molecules."
-  },
-  "cisplatin_dna": {
-    "title": "Cisplatin-DNA Binding",
-    "description": "Cisplatin binds to DNA, creating cross-links (mostly intra-strand) that bend the DNA helix. This structural distortion blocks replication and transcription, ultimately leading to cancer cell death."
+    "name": "Cisplatin (Platinol)",
+    "formula": "Pt(NH3)2Cl2",
+    "weight": "300.05 g/mol",
+    "baseState": {
+      "general": "First-generation organoplatinum antineoplastic agent\nGiven intravenously (IV)\nHighly effective but has significant toxicity",
+      "mechanism": "Forms DNA cross-links (intra-strand)\nInhibits DNA replication and transcription\nLeads to cell apoptosis",
+      "sideEffects": "Nephrotoxicity (major)\nOtotoxicity (hearing loss)\nPeripheral neuropathy",
+      "clinical": "Testicular cancer (very important)\nOvarian cancer\nBladder cancer"
+    },
+    "dnaState": {
+      "general": "First-generation organoplatinum antineoplastic agent\nGiven intravenously (IV)\nHighly effective but has significant toxicity",
+      "mechanism": "Forms DNA cross-links (intra-strand)\nInhibits DNA replication and transcription\nLeads to cell apoptosis",
+      "sideEffects": "Nephrotoxicity (major)\nOtotoxicity (hearing loss)\nPeripheral neuropathy",
+      "clinical": "Testicular cancer (very important)\nOvarian cancer\nBladder cancer"
+    }
   },
   "oxaliplatin": {
-    "title": "Oxaliplatin (Advanced Pt-drug)",
-    "description": "Oxaliplatin is a third-generation platinum-based chemotherapy. It features a bulky DACH ligand, making it effective against certain cisplatin-resistant cancers, particularly colorectal cancer."
-  },
-  "oxaliplatin_dna": {
-    "title": "Oxaliplatin-DNA Adduct",
-    "description": "Oxaliplatin forms bulky DNA adducts that are less easily recognized by cellular repair mechanisms compared to cisplatin. The resulting DNA damage triggers apoptosis."
+    "name": "Oxaliplatin (Eloxatin)",
+    "formula": "C8H14N2O4Pt",
+    "weight": "397.3 g/mol",
+    "baseState": {
+      "general": "A third-generation platinum analog. It is a cornerstone in the treatment of colorectal cancer, typically administered as part of the FOLFOX chemotherapy regimen.",
+      "mechanism": "Like Cisplatin, it undergoes aquation but at a slower rate. It features a large, bulky DACH (diaminocyclohexane) ligand, which completely alters its pharmacological profile and prevents cross-resistance.",
+      "sideEffects": "Unlike Cisplatin, it is much less toxic to the kidneys and ears. Its primary dose-limiting side effect is acute, cold-induced peripheral neuropathy (nerve pain triggered by cold).",
+      "clinical": "Administered intravenously. Often combined with 5-fluorouracil (5-FU) and leucovorin. Patients are strictly advised to avoid cold drinks and exposure to cold air for 3-5 days post-infusion."
+    },
+    "dnaState": {
+      "general": "Forms bulky, hydrophobic DNA cross-links that are structurally distinct from those formed by Cisplatin, making it highly effective against Cisplatin-resistant tumors.",
+      "mechanism": "Binds N7 of guanine residues forming 1,2-intrastrand crosslinks. The bulky DACH ligand protrudes into the major groove of the DNA, creating a rigid, narrower bend that causes extreme structural distortion.",
+      "sideEffects": "DACH-platinum adducts block DNA polymerase and RNA transcription. NER attempts repair; unrepaired lesions trigger p53-dependent apoptosis and mitotic catastrophe.",
+      "clinical": "Mismatch Repair (MMR) proteins fail to recognize the DACH-distorted DNA adducts. This prevents the cancer cell from initiating repair bypass mechanisms, permanently halting DNA synthesis."
+    }
   }
 }

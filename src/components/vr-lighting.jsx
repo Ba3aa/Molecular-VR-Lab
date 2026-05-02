@@ -1,3 +1,4 @@
+import { Environment } from '@react-three/drei';
 import { useAppStore } from '../store/app-store';
 
 export default function VrLighting() {
@@ -7,16 +8,17 @@ export default function VrLighting() {
 
   return (
     <>
-      {/* إضاءة محيطية خافتة لمنع الظلام التام في المناطق غير المضاءة */}
+      {/* بنضيف بيئة مشان المجسمات تبين حقيقية زي القزاز والمعدن */}
+      <Environment preset="city" />
+
+      {/* ضوء خفيف مشان الدنيا ما تكون عتمة بالمرة */}
       <ambientLight intensity={0.5} />
 
       {/*
-        مصدر ضوء موجَّه مع shadow camera مُوسَّعة:
-        - left/right/top/bottom = ±6 متر تغطي الأرضية كاملاً (radius=4)
-          مع هامش أمان 2 متر إضافي على كل جانب
-        - shadow-mapSize [1024,1024] — دقة كافية بدون ثقل على الـ GPU
-        - بدون التوسيع، الظلال كانت تُقطَع عند ±5 متر الافتراضي
-          وتظهر كحدود مرئية مفاجئة على الأرضية
+        ضوء بوجه (Directional) مع كاميرا ظلال وسيعة:
+        - غطينا الأرضية بـ 6 متر يمين وشمال وفوق وتحت مشان الظلال ما تروح
+        - دقة الظلال 1024 كويسة وما بتقل عالجهاز
+        - لو ما وسعنا كان الظلال انقصت وطلعت فجأة عالأرض
       */}
       <directionalLight
         position={[10, 20, 10]}
@@ -30,7 +32,7 @@ export default function VrLighting() {
         shadow-mapSize-height={1024}
       />
 
-      {/* نقطة ضوء ثانوية لملء الظلال العميقة من الاتجاه المعاكس */}
+      {/* ضوء ثاني مشان نعبي الظلال اللي بتطلع بالجهة الثانية */}
       <pointLight position={[-10, 10, -10]} intensity={0.5} />
     </>
   );

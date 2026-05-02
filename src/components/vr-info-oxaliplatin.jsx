@@ -4,77 +4,30 @@ import { useFrame } from '@react-three/fiber';
 import { Text, Edges } from '@react-three/drei';
 import { Interactive } from '@react-three/xr';
 import { useAppStore } from '../store/app-store';
+import drugData from '../drug-data.json';
 
 // ═══════════════════════════════════════════════════════════════════════
-// ① CONSTANTS — بيانات التبويبات (Oxaliplatin)
+// ① CONSTANTS
 // ═══════════════════════════════════════════════════════════════════════
 
-const TABS = {
-  general: {
-    label: 'General',
-    lines: [
-      { text: 'Generation:  3rd-gen platinum complex',      color: '#ffffff' },
-      { text: 'Carrier:  DACH (diaminocyclohexane)',        color: '#ffffff' },
-      { text: 'Leaving group:  Oxalate',                    color: '#ffffff' },
-      { text: 'Metal center:  Pt(II)  |  Square planar',    color: '#ffffff' },
-      { text: 'Key edge: DACH adducts escape MMR',          color: '#5DCAA5' },
-    ],
-  },
-  mechanism: {
-    label: 'Mechanism',
-    lines: [
-      { text: '1. Entry via CTR1 and OCT2 transporters',    color: '#ffffff' },
-      { text: '2. Aquation: Oxalate displaced by H2O',      color: '#ffffff' },
-      { text: '3. Bulky DACH-Pt-DNA adduct formation',      color: '#ffffff' },
-      { text: '4. MMR evasion vs. cisplatin resistance',    color: '#ffffff' },
-      { text: '5. Replication block -> Apoptosis',          color: '#ffffff' },
-    ],
-  },
-  adverse: {
-    label: 'Side Effects',
-    lines: [
-      { text: '[HALLMARK]  Peripheral neuropathy',          color: '#e87575' },
-      { text: '  Acute cold-triggered dysesthesia',         color: '#e87575' },
-      { text: '[MOD]  Myelosuppression',                    color: '#e8c475' },
-      { text: '[LOW]  Nephrotoxicity vs. cisplatin',        color: '#93d4b8' },
-      { text: 'PEARL: D5W only — NO NaCl diluent',          color: '#5DCAA5' },
-    ],
-  },
-  clinical: {
-    label: 'Clinical',
-    lines: [
-      { text: '● Colorectal Cancer (FOLFOX)',              color: '#ffffff' },
-      { text: '● Adjuvant Stage III Colon Ca',             color: '#ffffff' },
-      { text: '● Advanced Gastric Adenocarcinoma',          color: '#ffffff' },
-      { text: '● Pancreatic Cancer (FOLFIRINOX)',          color: '#ffffff' },
-      { text: 'Synergy: Combined with 5-FU/LV',            color: '#5DCAA5' },
-    ],
-  },
-};
-
-const TAB_KEYS = ['general', 'mechanism', 'adverse', 'clinical'];
-
-// أبعاد اللوحة - تم الضبط للراحة البصرية ومنع التداخل (W: 1.15m, H: 0.95m)
 const PANEL_W = 1.15;
 const PANEL_H = 0.95;
-
-// موقع المرساة: متماثل مع لوحة Cisplatin على اليسار [-1.8, 1.4, -1.5]
-// X = +1.8 = موقع Oxaliplatin (1.2) + 0.6م فاصل
-// Z = -1.5 نفس عمق اللوحة اليسرى تماماً
-// مُبعَدة للخلف (Z=-2.0) وللجانب (X=+2.2) — متماثلة مع لوحة Cisplatin
-// لمنع حافة الـ Billboard من التداخل مع النموذج عند X=+1.0
-// محطة Oxaliplatin — الجدار الأيمن
-// تم الضبط رياضياً: المحطة عند X=+3.0، النموذج عند X=+2.4، اللوحة عند X=+3.6
 const PANEL_POSITION = [3.6, 1.4, -1.6];
 
+const TAB_KEYS = ['General', 'Mechanism', 'Adverse', 'Clinical'];
+
+// ── Scratch Objects ────────────────────────────────────────────────────
+const _targetQuaternion = new THREE.Quaternion();
+const _dummyGroup = new THREE.Group();
+const _vTargetScaleUI = new THREE.Vector3(1, 1, 1);
+
 // ═══════════════════════════════════════════════════════════════════════
-// زر التبويب — Interactive للـ VR laser، onHover للـ desktop
-// ═══════════════════════════════════════════════════════════════════════
-function TabButton({ label, isActive, position, onSelect }) {
+// زر التبويب - بيتفاعل مع ليزر الـ VR
+function TabButton({ label, isActive, position, onSelect, color }) {
   const [hovered, setHovered] = useState(false);
 
-  const bgColor     = isActive ? '#1a6b5a' : hovered ? '#0f4a3d' : '#0a2e28';
-  const borderColor = isActive ? '#5DCAA5' : '#1a4a40';
+  const bgColor     = isActive ? color : hovered ? '#0f4a3d' : '#0a2e28';
+  const borderColor = isActive ? '#ffffff' : '#1a4a40';
   const textColor   = isActive ? '#ffffff' : '#5DCAA5';
 
   return (
@@ -90,9 +43,6 @@ function TabButton({ label, isActive, position, onSelect }) {
           <Edges color={borderColor} />
         </mesh>
       </Interactive>
-
-
-
       <Text
         position={[0, 0, 0.013]}
         fontSize={0.032}
@@ -106,137 +56,107 @@ function TabButton({ label, isActive, position, onSelect }) {
   );
 }
 
-// ═══════════════════════════════════════════════════════════════════════
-// محتوى التبويب النشط
-// المسافة مُكبَّرة من 0.1 إلى 0.115 — تمنع تداخل أي سطر مكسور مع التالي
-// fontSize مُصغَّر إلى 0.026 — النصوص الطويلة تبقى على سطر واحد بأمان
-// النصوص في adverse مُقصَّرة أيضاً لمنع الكسر التلقائي
-// ═══════════════════════════════════════════════════════════════════════
-function TabContent({ tabKey }) {
-  const lines = TABS[tabKey].lines;
-
-  return (
-    <group>
-      {lines.map((line, index) => (
-        <Text
-          key={index}
-          position={[-0.50, 0.12 - (index * 0.105), 0.015]} 
-          fontSize={0.038} 
-          color={line.color || '#ffffff'}
-          anchorX="left"
-          anchorY="top"
-          maxWidth={1.05}
-        >
-          {line.text}
-        </Text>
-      ))}
-    </group>
-  );
-}
-
-// ── Scratch Objects ────────────────────────────────────────────────────
-const _targetQuaternion = new THREE.Quaternion();
-const _dummyGroup = new THREE.Group();
-
-// ═══════════════════════════════════════════════════════════════════════
-// المكوّن الرئيسي
-// ═══════════════════════════════════════════════════════════════════════
+// المكون الأساسي للوحة
 export default function VrInfoOxaliplatin() {
   const isVrActive      = useAppStore((state) => state.isVrActive);
   const selectedModel   = useAppStore((state) => state.selectedModel);
   const isDnaMode       = useAppStore((state) => state.isDnaMode);
   const toggleDnaMode   = useAppStore((state) => state.toggleDnaMode);
-  const [activeTab, setActiveTab] = useState('general');
-
+  
+  const [activeTab, setActiveTab] = useState('General');
   const panelRef = useRef();
 
-  // ═══════════════════════════════════════════════════════════════════
-  // المنطق الذكي للوحة (حركة الطفو + الدوران الناعم)
-  // ═══════════════════════════════════════════════════════════════════
+  // بنجيب النص من ملف البيانات وبنرتبه مشان يوسع باللوحة
+  const currentDrug = drugData['oxaliplatin'];
+  const displayState = isDnaMode ? currentDrug.dnaState : currentDrug.baseState;
+
+  // بنحدد النص حسب أي تبويب كبست
+  let detailText = "";
+  if (activeTab === 'General')    detailText = displayState.general;
+  if (activeTab === 'Mechanism')  detailText = displayState.mechanism;
+  if (activeTab === 'Adverse')    detailText = displayState.sideEffects;
+  if (activeTab === 'Clinical')   detailText = displayState.clinical;
+
   useFrame((state) => {
     if (!panelRef.current) return;
-
-    // 1. حركة الطفو (Hover) - تجعل اللوحة تتنفس بارتفاع 2 سم
+    const delta = state.delta || 0.016;
+    panelRef.current.scale.lerp(_vTargetScaleUI, delta * 5.0);
     panelRef.current.position.y = 1.4 + Math.sin(state.clock.elapsedTime * 1.2) * 0.02;
-
-    // 2. الدوران الناعم (Lazy Rotation) - تواجه المستخدم بنعومة (Damping)
     _dummyGroup.position.copy(panelRef.current.position);
     _dummyGroup.lookAt(state.camera.position);
     _targetQuaternion.copy(_dummyGroup.quaternion);
-
-    // slerp يجعل الدوران "كسولاً" يتبع حركة الرأس بفخامة
     panelRef.current.quaternion.slerp(_targetQuaternion, 0.05);
   });
 
   if (!isVrActive) return null;
 
   const isOxaliSelected = selectedModel === 'oxaliplatin';
+  const frameColor      = isOxaliSelected ? '#5DCAA5' : '#ffffff';
   const titleColor      = isOxaliSelected ? '#7fffda' : '#ffffff';
+  const separatorColor  = isOxaliSelected ? '#1a6b5a' : '#2e5fa3';
 
   return (
-    <group ref={panelRef} position={PANEL_POSITION}>
-
-      {/* الخلفية الرئيسية - مادة هولوغرافية شفافة */}
+    <group ref={panelRef} position={PANEL_POSITION} scale={0}>
+      {/* الخلفية */}
       <mesh position={[0, 0, -0.012]}>
         <boxGeometry args={[PANEL_W, PANEL_H, 0.01]} />
         <meshBasicMaterial color="#061c19" transparent={true} opacity={0.95} />
-        <Edges color="#5DCAA5" />
+        <Edges color={frameColor} />
       </mesh>
 
-
-
-
-
-      {/* خط فاصل */}
-      <mesh position={[0, 0.22, 0]}>
-        <boxGeometry args={[PANEL_W, 0.003, 0.001]} />
-        <meshBasicMaterial color="#5DCAA5" />
-      </mesh>
-
-      {/*
-        العنوان مثبَّت في الزاوية اليسرى (anchorX="left", X=-0.42)
-        والمؤشر في الزاوية اليمنى (anchorX="right", X=+0.42)
-        — يضمن فصلاً كاملاً بينهما بغض النظر عن طول الكلمة.
-      */}
-      <Text
-        position={[-0.50, 0.36, 0.015]}
-        fontSize={0.065}
-        color={titleColor}
-        anchorX="left"
-        anchorY="middle"
-        fontWeight="bold"
-      >
-        Oxaliplatin
+      {/* العنوان */}
+      <Text position={[-0.50, 0.36, 0.015]} fontSize={0.06} color={titleColor} anchorX="left" anchorY="middle" fontWeight="bold">
+        {currentDrug.name}
       </Text>
 
       {isOxaliSelected && (
-        <Text
-          position={[0.50, 0.36, 0.015]}
-          fontSize={0.022}
-          color="#5DCAA5"
-          anchorX="right"
-          anchorY="middle"
-        >
+        <Text position={[0.50, 0.36, 0.015]} fontSize={0.022} color="#5DCAA5" anchorX="right" anchorY="middle">
           ● ACTIVE
         </Text>
       )}
 
-      {/*
-        سطر التفاصيل عند Y=0.23 — يبتعد عن الخط الفاصل (Y=0.22)
-        بمسافة 0.01م بدلاً من 0.04م السابقة التي كانت داخل شريط الرأس.
-      */}
-      {/* سطر التفاصيل - محاذى لليسار ومرفوع عن الخط الفاصل */}
-      <Text
-        position={[-0.50, 0.25, 0.015]}
-        fontSize={0.032}
-        color="#5DCAA5"
-        anchorX="left"
-        anchorY="middle"
-      >
-        3rd-gen platinum agent  |  MW: 397.3 g/mol
+      {/* التفاصيل اللي فوق */}
+      <Text position={[-0.50, 0.25, 0.015]} fontSize={0.032} color="#5DCAA5" anchorX="left" anchorY="middle">
+        {currentDrug.formula}  |  {currentDrug.weight}
       </Text>
 
-      {/* زر التبديل المطور لوضع الـ DNA - تصميم أنيق (Premium) */}
+      {/* خط بالنص */}
+      <mesh position={[0, 0.20, 0]}>
+        <boxGeometry args={[PANEL_W - 0.1, 0.003, 0.001]} />
+        <meshBasicMaterial color={separatorColor} />
+      </mesh>
+
+      {/* المحتوى حسب التبويب - نص مرتب */}
+      <group position={[-0.50, 0.12, 0.015]}>
+        <Text fontSize={0.038} color="#5DCAA5" anchorX="left" anchorY="top" fontWeight="bold">
+          {activeTab.toUpperCase()}
+        </Text>
+        <Text 
+          position={[0, -0.06, 0]} 
+          fontSize={0.028} 
+          color="#ffffff" 
+          anchorX="left" 
+          anchorY="top" 
+          maxWidth={1.0}
+          lineHeight={1.4}
+        >
+          {detailText}
+        </Text>
+      </group>
+
+      {/* الكبسات اللي تحت */}
+      {TAB_KEYS.map((key, i) => (
+        <TabButton
+          key={key}
+          label={key}
+          isActive={activeTab === key}
+          position={[-0.39 + i * 0.26, -0.40, 0.01]}
+          onSelect={() => setActiveTab(key)}
+          color="#1a6b5a"
+        />
+      ))}
+
+      {/* كبسة عرض الـ DNA */}
       <group position={[0.38, 0.31, 0.015]}>
         <Interactive onSelect={toggleDnaMode}>
           <mesh>
@@ -245,32 +165,10 @@ export default function VrInfoOxaliplatin() {
             <Edges color={'#34d399'} />
           </mesh>
         </Interactive>
-        <Text
-          position={[0, 0, 0.01]}
-          fontSize={0.030}
-          color={'#ffffff'}
-          anchorX="center"
-          anchorY="middle"
-          fontWeight="bold"
-        >
+        <Text position={[0, 0, 0.01]} fontSize={0.030} color={'#ffffff'} anchorX="center" anchorY="middle" fontWeight="bold">
           🧬 DNA View
         </Text>
       </group>
-
-      {/* محتوى التبويب */}
-      <TabContent tabKey={activeTab} />
-
-      {/* أزرار التبويب - تم التوزيع بمسافات متناسقة مع عرض 1.15 */}
-      {TAB_KEYS.map((key, i) => (
-        <TabButton
-          key={key}
-          label={TABS[key].label}
-          isActive={activeTab === key}
-          position={[-0.39 + i * 0.26, -0.40, 0.01]}
-          onSelect={() => setActiveTab(key)}
-        />
-      ))}
-
     </group>
   );
 }
