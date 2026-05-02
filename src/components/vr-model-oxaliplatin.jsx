@@ -202,7 +202,6 @@ export default function VrModelOxaliplatin() {
 
   return (
     <group position={ANCHOR_POSITION}>
-    <group position={ANCHOR_POSITION}>
       {/* بنبلش بحجم صفر مشان يشتغل الأنيميشن */}
       <group ref={positionGroupRef} scale={0}>
         <group ref={pivotGroupRef} scale={FIXED_SCALE}>
