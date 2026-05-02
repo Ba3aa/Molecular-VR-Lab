@@ -23,13 +23,13 @@
     "baseState": {
       "general": "Third-generation organoplatinum antineoplastic agent\nLess nephrotoxic and ototoxic than cisplatin\nCommonly used in combination regimens (e.g., FOLFOX)",
       "mechanism": "Forms DNA cross-links (intra-strand)\nInhibits DNA replication and transcription\nLeads to cell apoptosis",
-      "sideEffects": "Unlike Cisplatin, it is much less toxic to the kidneys and ears. Its primary dose-limiting side effect is acute, cold-induced peripheral neuropathy (nerve pain triggered by cold).",
+      "sideEffects": "Peripheral neuropathy\nNausea and vomiting\nMyelosuppression",
       "clinical": "Administered intravenously. Often combined with 5-fluorouracil (5-FU) and leucovorin. Patients are strictly advised to avoid cold drinks and exposure to cold air for 3-5 days post-infusion."
     },
     "dnaState": {
       "general": "Third-generation organoplatinum antineoplastic agent\nLess nephrotoxic and ototoxic than cisplatin\nCommonly used in combination regimens (e.g., FOLFOX)",
       "mechanism": "Forms DNA cross-links (intra-strand)\nInhibits DNA replication and transcription\nLeads to cell apoptosis",
-      "sideEffects": "DACH-platinum adducts block DNA polymerase and RNA transcription. NER attempts repair; unrepaired lesions trigger p53-dependent apoptosis and mitotic catastrophe.",
+      "sideEffects": "Peripheral neuropathy\nNausea and vomiting\nMyelosuppression",
       "clinical": "Mismatch Repair (MMR) proteins fail to recognize the DACH-distorted DNA adducts. This prevents the cancer cell from initiating repair bypass mechanisms, permanently halting DNA synthesis."
     }
   }
