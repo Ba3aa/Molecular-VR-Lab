@@ -24,13 +24,13 @@
       "general": "Third-generation organoplatinum antineoplastic agent\nLess nephrotoxic and ototoxic than cisplatin\nCommonly used in combination regimens (e.g., FOLFOX)",
       "mechanism": "Forms DNA cross-links (intra-strand)\nInhibits DNA replication and transcription\nLeads to cell apoptosis",
       "sideEffects": "Peripheral neuropathy\nNausea and vomiting\nMyelosuppression",
-      "clinical": "Administered intravenously. Often combined with 5-fluorouracil (5-FU) and leucovorin. Patients are strictly advised to avoid cold drinks and exposure to cold air for 3-5 days post-infusion."
+      "clinical": "Colorectal cancer (main indication)\nUsed in regimens like:\nFOLFOX"
     },
     "dnaState": {
       "general": "Third-generation organoplatinum antineoplastic agent\nLess nephrotoxic and ototoxic than cisplatin\nCommonly used in combination regimens (e.g., FOLFOX)",
       "mechanism": "Forms DNA cross-links (intra-strand)\nInhibits DNA replication and transcription\nLeads to cell apoptosis",
       "sideEffects": "Peripheral neuropathy\nNausea and vomiting\nMyelosuppression",
-      "clinical": "Mismatch Repair (MMR) proteins fail to recognize the DACH-distorted DNA adducts. This prevents the cancer cell from initiating repair bypass mechanisms, permanently halting DNA synthesis."
+      "clinical": "Colorectal cancer (main indication)\nUsed in regimens like:\nFOLFOX"
     }
   }
 }
