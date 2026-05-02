@@ -8,8 +8,9 @@ import './index.css';
 if (typeof window !== 'undefined') {
   const _oldError = window.onerror;
   window.onerror = function (message, source, lineno, colno, error) {
-    if (message && message.toString().includes("reading '0'")) {
+    if (message && (message.toString().includes("reading '0'") || message.toString().includes("_transformBasePoseMatrix"))) {
       // طنّش الخطأ مشان ما تضل تطلع بوجهنا بلاوي بالكونسول
+      // هاي الأخطاء كلها من المحاكي (Emulator) وما الها دخل بكودنا
       return true; 
     }
     if (_oldError) return _oldError(message, source, lineno, colno, error);
